@@ -4,15 +4,15 @@ Discovers estimators by task type, capability tags, and/or name search.
 """
 
 import difflib
-from typing import Any, Optional
+from typing import Any
 
 from sktime_mcp.registry.interface import get_registry
 
 
 def list_estimators_tool(
-    task: Optional[str] = None,
-    tags: Optional[dict[str, Any]] = None,
-    query: Optional[str] = None,
+    task: str | None = None,
+    tags: dict[str, Any] | None = None,
+    query: str | None = None,
     limit: int = 50,
     offset: int = 0,
 ) -> dict[str, Any]:

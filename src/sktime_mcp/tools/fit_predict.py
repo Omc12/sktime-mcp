@@ -5,7 +5,7 @@ Executes complete forecasting workflows.
 """
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from sktime_mcp.runtime.executor import get_executor
 
@@ -16,7 +16,7 @@ def fit_predict_tool(
     estimator_handle: str,
     dataset: str,
     horizon: int = 12,
-    data_handle: Optional[str] = None,
+    data_handle: str | None = None,
 ) -> dict[str, Any]:
     """
     Execute a complete fit-predict workflow.
@@ -111,8 +111,8 @@ def list_datasets_tool() -> dict[str, Any]:
 
 def fit_predict_async_tool(
     estimator_handle: str,
-    dataset: Optional[str] = None,
-    data_handle: Optional[str] = None,
+    dataset: str | None = None,
+    data_handle: str | None = None,
     horizon: int = 12,
 ) -> dict[str, Any]:
     """

@@ -5,7 +5,7 @@ Defines the interface that all data source adapters must implement.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -35,29 +35,30 @@ class DataSourceAdapter(ABC):
     def load(self) -> pd.DataFrame:
         """
         Load data from the source (synchronous).
-        
+
         Returns:
             DataFrame with time index
         """
         pass
-    
-    async def load_async(self, job_id: Optional[str] = None) -> pd.DataFrame:
+
+    async def load_async(self, job_id: str | None = None) -> pd.DataFrame:
         """
         Load data from the source (asynchronous).
-        
+
         Default implementation runs the synchronous load() in a separate thread.
         Adapters should override this for true non-blocking async IO.
-        
+
         Args:
             job_id: Optional job ID for progress reporting
-            
+
         Returns:
             DataFrame with time index
         """
         import asyncio
+
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, self.load)
-    
+
     @abstractmethod
     def validate(self, data: pd.DataFrame) -> tuple[bool, dict[str, Any]]:
         """
@@ -75,7 +76,7 @@ class DataSourceAdapter(ABC):
         """
         pass
 
-    def to_sktime_format(self, data: pd.DataFrame) -> tuple[pd.Series, Optional[pd.DataFrame]]:
+    def to_sktime_format(self, data: pd.DataFrame) -> tuple[pd.Series, pd.DataFrame | None]:
         """
         Convert to sktime format (y, X).
 
