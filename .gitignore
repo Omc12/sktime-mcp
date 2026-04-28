@@ -5,4 +5,5 @@ __pycache__/
 TODO.md
 dist/
 docs/_build/
-docs/build/
+docs/build/venv/
+agentic_forecaster/data/train.csv
