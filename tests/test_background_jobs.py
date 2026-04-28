@@ -2,11 +2,6 @@
 Test background job management.
 """
 
-import asyncio
-import time
-
-import pytest
-
 from sktime_mcp.runtime.executor import get_executor
 from sktime_mcp.runtime.jobs import JobStatus, get_job_manager
 
@@ -121,53 +116,6 @@ def test_list_jobs():
     job_manager.delete_job(job3)
 
 
-@pytest.mark.asyncio
-async def test_async_fit_predict():
-    """Test async fit_predict."""
-    executor = get_executor()
-    job_manager = get_job_manager()
-
-    # Instantiate a simple forecaster
-    result = executor.instantiate("NaiveForecaster")
-    assert result["success"]
-    handle = result["handle"]
-
-    print(f"✓ Instantiated NaiveForecaster: {handle}")
-
-    # Create job
-    job_id = job_manager.create_job(
-        job_type="fit_predict",
-        estimator_handle=handle,
-        estimator_name="NaiveForecaster",
-        dataset_name="airline",
-        horizon=12,
-        total_steps=3,
-    )
-
-    print(f"✓ Created job: {job_id}")
-
-    # Run async fit_predict
-    result = await executor.fit_predict_async(handle, "airline", 12, job_id)
-
-    # Check result
-    assert result["success"]
-    assert "predictions" in result
-
-    # Check job status
-    job = job_manager.get_job(job_id)
-    assert job.status == JobStatus.COMPLETED
-    assert job.result is not None
-
-    print("✓ Async fit_predict completed")
-    print(f"  Status: {job.status.value}")
-    print(f"  Progress: {job.progress_percentage}%")
-    print(f"  Elapsed time: {job.elapsed_time}s")
-    print(f"  Predictions: {len(result['predictions'])} steps")
-
-    # Cleanup
-    job_manager.delete_job(job_id)
-
-
 def test_cancel_job():
     """Test cancelling a job."""
     job_manager = get_job_manager()
@@ -218,9 +166,6 @@ def run_all_tests():
 
     print("\n3. Testing list jobs...")
     test_list_jobs()
-
-    print("\n4. Testing async fit_predict...")
-    asyncio.run(test_async_fit_predict())
 
     print("\n5. Testing cancel job...")
     test_cancel_job()

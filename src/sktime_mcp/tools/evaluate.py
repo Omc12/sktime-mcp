@@ -54,7 +54,6 @@ def evaluate_estimator_tool(
         folds = max(1, min(int(cv_folds), max(1, n - 1)))
         # Exactly `folds` backtest windows: train grows, last fold uses n-1 obs before last point.
         initial_window = max(1, n - folds)
-
         cv = ExpandingWindowSplitter(initial_window=initial_window, step_length=1, fh=[1])
 
         results = evaluate(forecaster=instance, y=y, X=X, cv=cv)
