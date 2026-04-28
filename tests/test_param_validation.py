@@ -10,12 +10,12 @@ import pytest
 
 sys.path.insert(0, "src")
 
+from sktime_mcp.tools.fit_predict import predict_tool
 from sktime_mcp.tools.instantiate import (
     _validate_params,
     instantiate_estimator_tool,
     instantiate_pipeline_tool,
 )
-from sktime_mcp.tools.fit_predict import predict_tool
 
 
 class TestValidateParams:
@@ -36,7 +36,7 @@ class TestValidateParams:
         """A normal dict with primitive values should be valid."""
         result = _validate_params({"order": [1, 1, 1], "suppress_warnings": True})
         assert result["valid"] is True
-    
+
     @pytest.mark.parametrize(
         ("invalid_params", "expected_error"),
         [
@@ -46,12 +46,9 @@ class TestValidateParams:
             ({"fn": lambda: None}, "Unsupported type"),
             ({"cls": object}, "Unsupported type"),
             ({"items": [1, 2, lambda: None]}, "Unsupported type"),
-        ]
+        ],
     )
-    def test_params_invalid_inputs_rejected(
-        self,
-        invalid_params,
-        expected_error) :
+    def test_params_invalid_inputs_rejected(self, invalid_params, expected_error):
         """Tests to reject invalid input parameters"""
         result = _validate_params(invalid_params)
         assert result["valid"] is False
@@ -114,8 +111,10 @@ class TestPipelineParamsValidation:
         assert result["success"] is False
         assert "Unsupported type" in result["error"]
 
+
 class TestFitPredictValidation:
     """Tests for parameter validation in fit_predict tools."""
+
     @pytest.mark.parametrize(
         "invalid_horizon, expected_error",
         [
@@ -124,14 +123,15 @@ class TestFitPredictValidation:
             (-3, "greater than 0"),
             (None, "must be an integer"),
             (3.14, "must be an integer"),
-            ([1,2], "must be an integer"),
-        ]
+            ([1, 2], "must be an integer"),
+        ],
     )
     def test_predict_tool_horizon_string(self, invalid_horizon, expected_error):
         """Invalid horizons should be rejected with the correct error"""
         result = predict_tool("fake_handle", horizon=invalid_horizon)
         assert result["success"] is False
         assert expected_error in result["error"]
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

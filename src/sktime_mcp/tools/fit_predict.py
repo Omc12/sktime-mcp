@@ -11,7 +11,8 @@ from sktime_mcp.runtime.executor import get_executor
 
 logger = logging.getLogger(__name__)
 
-def _validate_horizon(horizon: int) -> dict[str,Any]:
+
+def _validate_horizon(horizon: int) -> dict[str, Any]:
     """
     Validate the horizon parameter.
     Checks if the horizon parameter is strictly integer or not
@@ -25,18 +26,18 @@ def _validate_horizon(horizon: int) -> dict[str,Any]:
                 f"'horizon' must be an integer, got {type(horizon).__name__}. "
                 f'Example: {{"horizon": 12}}'
             ),
-            "warnings":warnings,  
+            "warnings": warnings,
         }
     if horizon <= 0:
         return {
             "valid": False,
             "error": (
-                f"'horizon' must be greater than 0, got {horizon}. "
-                f'Example: {{"horizon": 12}}'
+                f"'horizon' must be greater than 0, got {horizon}. " f'Example: {{"horizon": 12}}'
             ),
-            "warnings":warnings,
+            "warnings": warnings,
         }
     return {"valid": True, "warnings": warnings}
+
 
 def fit_predict_tool(
     estimator_handle: str,
@@ -72,6 +73,7 @@ def fit_predict_tool(
         return {
             "success": False,
             "error": validation["error"],
+        }
     if dataset and data_handle:
         return {
             "success": False,
@@ -261,6 +263,3 @@ def fit_predict_async_tool(
         "data_source": source_name,
         "horizon": horizon,
     }
-
-
-
