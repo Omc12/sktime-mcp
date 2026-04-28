@@ -27,11 +27,15 @@ class AgenticForecaster(BaseForecaster):
         self.explanation_ = None
         super().__init__()
 
-    def _fit(self, y, X=None, fh=None):
+    def _fit(self, y: pd.Series | pd.DataFrame, X: pd.DataFrame | None = None, fh: Any | None = None):
+        """
+        Logic for selecting an estimator based on the prompt and fitting it.
+        """
         registry = get_registry()
         lower_prompt = self.prompt.lower()
         tags_to_query = {}
         
+        # Heuristic reasoning based on prompt keywords
         if "interval" in lower_prompt or "probabilistic" in lower_prompt:
             tags_to_query["capability:pred_int"] = True
             
@@ -42,8 +46,10 @@ class AgenticForecaster(BaseForecaster):
             
         estimators = registry.get_all_estimators(task="forecasting", tags=tags_to_query)
         if not estimators:
+            # Fallback to all forecasters if tags are too restrictive
             estimators = registry.get_all_estimators(task="forecasting")
             
+        # Select model based on name hints or default to first match
         if "arima" in lower_prompt:
             selected_node = next((e for e in estimators if "ARIMA" in e.name), estimators[0])
         else:
@@ -51,13 +57,19 @@ class AgenticForecaster(BaseForecaster):
             
         self.selected_model_name_ = selected_node.name
         self.estimator_ = selected_node.class_ref()
-        self.explanation_ = f"Selected {self.selected_model_name_} for prompt: {self.prompt}"
+        self.explanation_ = f"Selected {self.selected_model_name_} based on requirement: {self.prompt}"
         
         self.estimator_.fit(y, X=X, fh=fh)
         return self
 
-    def _predict(self, fh=None, X=None):
+    def _predict(self, fh: Any | None = None, X: pd.DataFrame | None = None):
+        """
+        Generate predictions using the agent-selected estimator.
+        """
         return self.estimator_.predict(fh=fh, X=X)
 
-    def explain(self):
-        return self.explanation_
+    def explain(self) -> str:
+        """
+        Return a natural language explanation of why the model was selected.
+        """
+        return self.explanation_ or "No model selected yet."

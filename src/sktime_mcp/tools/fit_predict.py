@@ -4,10 +4,12 @@ fit_predict tool for sktime MCP.
 Executes complete forecasting workflows.
 """
 
+import asyncio
 import logging
 from typing import Any
 
 from sktime_mcp.runtime.executor import get_executor
+from sktime_mcp.runtime.jobs import get_job_manager
 
 logger = logging.getLogger(__name__)
 
@@ -50,11 +52,11 @@ def fit_predict_tool(
         }
     executor = get_executor()
     return executor.fit_predict(
-        estimator_handle, 
-        dataset=dataset, 
-        horizon=horizon, 
+        estimator_handle,
+        dataset=dataset,
+        horizon=horizon,
         data_handle=data_handle,
-        exog_handle=exog_handle
+        exog_handle=exog_handle,
     )
 
 
@@ -164,10 +166,6 @@ def fit_predict_async_tool(
                 "'data_handle' (from load_data_source) is required."
             ),
         }
-
-    import asyncio
-
-    from sktime_mcp.runtime.jobs import get_job_manager
 
     executor = get_executor()
     job_manager = get_job_manager()
